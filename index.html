@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micro Hub — My Creations</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7fff6e;
+    --accent2: #6ec4ff;
+    --accent3: #ff6eb4;
+    --accent4: #ffb86e;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --tag-bg: rgba(127,255,110,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(127,255,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(127,255,110,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(127,255,110,0.06); top: -200px; left: -100px; }
+  .orb2 { width: 400px; height: 400px; background: rgba(110,196,255,0.05); bottom: -100px; right: -100px; }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 48px 40px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo-block { display: flex; flex-direction: column; gap: 6px; }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  .tagline {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .stat {
+    text-align: right;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    position: relative;
+    z-index: 10;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-right: 4px;
+  }
+
+  .tag-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 5px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .tag-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--tag-bg);
+  }
+
+  .tag-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+    font-weight: 400;
+  }
+
+  /* Search */
+  .search-wrap {
+    margin-left: auto;
+    position: relative;
+  }
+
+  .search-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px 6px 32px;
+    border-radius: 2px;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  /* ── MAIN GRID ── */
+  main {
+    position: relative;
+    z-index: 10;
+    padding: 32px 40px 80px;
+  }
+
+  /* Section groupings */
+  .section-group {
+    margin-bottom: 48px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-count {
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+
+  /* Card grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--cat-color, var(--accent));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .card-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .card-tag {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cat-color, var(--accent));
+    background: rgba(127,255,110,0.06);
+    border: 1px solid rgba(127,255,110,0.12);
+    padding: 3px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+    transition: color 0.15s;
+  }
+
+  .card:hover .card-title { color: var(--cat-color, var(--accent)); }
+
+  .card-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .card-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-link {
+    font-size: 10px;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+
+  .card-arrow {
+    font-size: 14px;
+    color: var(--muted);
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  .card:hover .card-arrow {
+    color: var(--cat-color, var(--accent));
+    transform: translate(2px, -2px);
+  }
+
+  /* Empty state */
+  .empty-state {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .empty-state .big { font-size: 40px; margin-bottom: 12px; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 20px 40px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .footer-text { font-size: 11px; color: var(--muted); }
+  .footer-text span { color: var(--accent); }
+
+  /* How to edit note */
+  .edit-note {
+    background: var(--surface2);
+    border: 1px solid rgba(110,196,255,0.2);
+    border-left: 3px solid var(--accent2);
+    border-radius: 4px;
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+    position: relative;
+    z-index: 10;
+  }
+  .edit-note strong { color: var(--accent2); }
+
+  @media (max-width: 600px) {
+    header, .filter-bar, main, footer { padding-left: 20px; padding-right: 20px; }
+    .header-stats { display: none; }
+    .search-wrap { margin-left: 0; }
+    .search-input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<header>
+  <div class="logo-block">
+    <div class="logo">Micro<span>Hub</span></div>
+    <div class="tagline">All my blueprints · one place</div>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <div class="stat-num" id="total-count">0</div>
+      <div class="stat-label">Projects</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="cat-count">0</div>
+      <div class="stat-label">Categories</div>
+    </div>
+  </div>
+</header>
+
+<div class="filter-bar" id="filter-bar">
+  <span class="filter-label">Filter //</span>
+  <!-- Tags injected by JS -->
+</div>
+
+<main>
+  <div class="edit-note">
+    <strong>// How to add your projects:</strong> Open this HTML file → find the <strong>PROJECTS_DATA</strong> array near the top of the &lt;script&gt; → add an object with <strong>title, desc, url, icon, category</strong>. Save and refresh. Done.
+  </div>
+  <div id="content"></div>
+</main>
+
+<footer>
+  <div class="footer-text">Built with 🖤 — <span>MicroHub</span></div>
+  <div class="footer-text" id="filter-status">Showing all projects</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  PROJECTS DATA — Edit this array to add / update your projects
+//  Fields:
+//    title    : Display name
+//    desc     : Short description
+//    url      : Link to the project (GitHub Pages, etc.)
+//    icon     : Emoji icon
+//    category : One of the categories below (or add your own)
+// ═══════════════════════════════════════════════════════════════
+const PROJECTS_DATA = [
+  {
+    title: "Product X",
+    desc: "Feature Architecture ERD · Product Blueprint",
+    url: "https://adxcortex.github.io/erd001",
+    icon: "🈸",
+    category: "PRD"
+  },
+  {
+    title: "International Growth System",
+    desc: "A complete dual-path blueprint  to find, filter, and close international clients at scale with zero content marketing.",
+    url: "https://adxcortex.github.io/blueprint001",
+    icon: "⚡",
+    category: "Automation"
+  },
+  {
+    title: "Content OS",
+    desc: "Instagram Growth Command Notebook — @adithya.a.a.h",
+    url: "https://adxcortex.github.io/content001",
+    icon: "🔷",
+    category: "Content "
+    category: "Content Creation"
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  CATEGORY COLORS — maps category name → CSS color
+//  Add more if you create new categories
+// ═══════════════════════════════════════════════════════════════
+const CATEGORY_COLORS = {
+  "Content Creation": "#7fff6e",
+  "Automation":       "#6ec4ff",
+  "ERP":              "#ffb86e",
+  "Productivity":     "#ff6eb4",
+  "PRD":              "#c46eff",
+  "Design Tools":     "#6efff7"
+};
+
+// ─── App State ─────────────────────────────────────────────────
+let activeFilter = "All";
+let searchQuery = "";
+
+// ─── Derive categories ─────────────────────────────────────────
+const allCategories = ["All", ...new Set(PROJECTS_DATA.map(p => p.category))];
+
+// ─── Build filter bar ──────────────────────────────────────────
+function buildFilterBar() {
+  const bar = document.getElementById("filter-bar");
+
+  // Add search input
+  const sw = document.createElement("div");
+  sw.className = "search-wrap";
+  sw.innerHTML = `<span class="search-icon">⌕</span>
+    <input class="search-input" type="text" placeholder="Search projects…" id="search-input">`;
+  bar.appendChild(sw);
+
+  // Inject tag buttons before search
+  allCategories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "tag-btn" + (cat === "All" ? " active" : "");
+    btn.textContent = cat;
+    btn.dataset.cat = cat;
+    btn.onclick = () => { activeFilter = cat; render(); };
+    bar.insertBefore(btn, sw);
+  });
+
+  document.getElementById("search-input").addEventListener("input", e => {
+    searchQuery = e.target.value.toLowerCase();
+    render();
+  });
+}
+
+// ─── Filter projects ───────────────────────────────────────────
+function getFiltered() {
+  return PROJECTS_DATA.filter(p => {
+    const matchCat = activeFilter === "All" || p.category === activeFilter;
+    const matchSearch = !searchQuery ||
+      p.title.toLowerCase().includes(searchQuery) ||
+      p.desc.toLowerCase().includes(searchQuery) ||
+      p.category.toLowerCase().includes(searchQuery);
+    return matchCat && matchSearch;
+  });
+}
+
+// ─── Render ────────────────────────────────────────────────────
+function render() {
+  // Update active filter button
+  document.querySelectorAll(".tag-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.cat === activeFilter);
+  });
+
+  const filtered = getFiltered();
+  const content = document.getElementById("content");
+  content.innerHTML = "";
+
+  document.getElementById("filter-status").textContent =
+    `Showing ${filtered.length} of ${PROJECTS_DATA.length} projects`;
+
+  if (filtered.length === 0) {
+    content.innerHTML = `<div class="cards-grid">
+      <div class="empty-state">
+        <div class="big">🔍</div>
+        No projects match your filter.
+      </div>
+    </div>`;
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  filtered.forEach(p => {
+    if (!groups[p.category]) groups[p.category] = [];
+    groups[p.category].push(p);
+  });
+
+  let delay = 0;
+  Object.entries(groups).forEach(([cat, items]) => {
+    const section = document.createElement("div");
+    section.className = "section-group";
+
+    const color = CATEGORY_COLORS[cat] || "#7fff6e";
+
+    section.innerHTML = `
+      <div class="section-header">
+        <span class="section-title">${cat}</span>
+        <div class="section-line"></div>
+        <span class="section-count">${items.length}</span>
+      </div>
+      <div class="cards-grid" id="grid-${cat.replace(/\s/g,'_')}"></div>
+    `;
+    content.appendChild(section);
+
+    const grid = section.querySelector(".cards-grid");
+    items.forEach((p, i) => {
+      const card = document.createElement("a");
+      card.className = "card";
+      card.href = p.url || "#";
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.style.setProperty("--cat-color", color);
+      card.style.animationDelay = `${delay * 50}ms`;
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-icon">${p.icon || "📎"}</div>
+          <span class="card-tag" style="color:${color};border-color:${color}22;background:${color}0d">${p.category}</span>
+        </div>
+        <div class="card-title">${p.title}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="card-footer">
+          <span class="card-link">${(p.url || "").replace("https://","")}</span>
+          <span class="card-arrow">↗</span>
+        </div>
+      `;
+      grid.appendChild(card);
+      delay++;
+    });
+  });
+}
+
+// ─── Init ──────────────────────────────────────────────────────
+document.getElementById("total-count").textContent = PROJECTS_DATA.length;
+document.getElementById("cat-count").textContent = allCategories.length - 1;
+
+buildFilterBar();
+render();
+</script>
+</body>
+</html>
